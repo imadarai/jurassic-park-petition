@@ -1,7 +1,12 @@
 const express = require ('express');
 const app = express();
-const db = require('./utils/db.js');
+const database = require('./utils/db.js');
+var cookieSession = require('cookie-session');
+const csurf = require('csurf');
 // const {hash, compare} = require("./utils/bc.js");
+
+
+
 
 
 //////////////////////////////////////////////////
@@ -12,84 +17,124 @@ app.engine('handlebars', hb());
 app.set('view engine', 'handlebars');
 
 //////////////////////////////////////////////////
-//                   MIDDLEWARE                 //
+//               EXPRESS STATIC                 //
+// ///////////////////////////////////////////////
+app.use(express.static(__dirname + '/public'));
+//////////////////////////////////////////////////
+//            EXPRESS URL ENCODED               //
 // ///////////////////////////////////////////////
 app.use(express.urlencoded({extended: false}));
-
+//////////////////////////////////////////////////
+//               COOKIE SESSION                 //
+// ///////////////////////////////////////////////
+app.use(cookieSession({
+    secret: `I'm always angry.`,
+    maxAge: 1000 * 60 * 60 * 24 * 14
+}));
+//////////////////////////////////////////////////
+//          Protecting Against CSRF             //
+// ///////////////////////////////////////////////
+app.use(csurf());
+//////////////////////////////////////////////////
+//                CSRF & MIDDLEWARE              //
+// ///////////////////////////////////////////////
 app.use((req, res, next) => {
-    console.log("Middleware is Running!");
+    res.locals.csrfToken = req.csrfToken();
     next();
 });
 
-//////////////////////////////////////////////////
-//                     STATIC                   //
-// ///////////////////////////////////////////////
-app.use(express.static(__dirname + '/public'));
+
+
+
 
 
 //////////////////////////////////////////////////
 //                GET - ROUTES                  //
 // ///////////////////////////////////////////////
 
-
-// ---------MAIN ROUTE --------//
+// ---------------------------------MAIN ROUTE -------------------------------//
 app.get("/", (req, res) => {
     //redirecting all traffice to /petition page
     res.redirect("/petition");
 });
-
-// ---------/PETIRION ROUTE --------//
+// ------------------------------/PETIRION ROUTE -----------------------------//
 app.get("/petition", (req, res) => {
-    //rendering petition page using petition.handlebars
-    res.render ("petition", {
-        layout: "main",
-    });
-});
+    //Check for Cookie Session
+    if (req.session.userId) {
+        res.redirect("/petition/signed");
 
-// ---------/PETIRION/SIGNED ROUTE --------//
-app.get("/petition/signed", (req, res) => {
-    //DB request to pull all data ROWS
-    db.selectAll().then(result => {
-        //set a variable to rowCount
-        let totalNumSignatures = result.rowCount;
-        //render signed page with handlebars and pass total number of rows
-        res.render("signed", {
+    } else {
+        //rendering petition page using petition.handlebars
+        res.render ("petition", {
             layout: "main",
-            //passing data
-            totalNumSignatures: totalNumSignatures,
         });
-    });
 
+    }
 });
-
-// ---------/PETIRION/SIGNERS ROUTE --------//
+// -------------------------/PETITION/SIGNED ROUTE ---------------------------//
+app.get("/petition/signed", (req, res) => {
+    //Check for Cookie Session
+    if (!req.session.userId) {
+        res.redirect("/petition");
+    } else {
+        //DB request to pull all data ROWS
+        database.selectAll().then(result => {
+            //set a variable to rowCount
+            let totalNumSignatures = result.rowCount;
+            //NESTED DB Query to pull Signature of current User
+            database.getSig(req.session.userId).then( results => {
+                //SET VARIABLE TO STORE IMAGE
+                let sigImage = results.rows[0].signature;
+                //Rendering /peititon/signed page
+                res.render("signed", {
+                    layout: "main",
+                    //passing data for Signature Count and Signature Image
+                    totalNumSignatures: totalNumSignatures,
+                    sigImage : sigImage
+                });
+            }).catch(err => console.log(err));
+        });
+    }
+});
+// -------------------------/PETIRION/SIGNERS ROUTE ---------------------------//
 app.get("/petition/signers", (req, res) => {
+    if (!req.session.userId) {
+        res.redirect("/petition");
+
+    } else {
     //db request to pull all data on ROWS
-    db.selectAll()
-        .then( result => {
-            //variable to set all rows to pull first and last
-            let allSigners = result.rows;
-            //render signers page with first and last name of all signatures
-            res.render("signers", {
-                layout: "main",
-                //passing data
-                allSigners
+        database.selectAll()
+            .then( result => {
+                //variable to set all rows to pull first and last
+                let allSigners = result.rows;
+                //render signers page with first and last name of all signatures
+                res.render("signers", {
+                    layout: "main",
+                    //passing data
+                    allSigners
+                });
             });
-        });
+    }
 });
+
+
+
 
 
 //////////////////////////////////////////////////
 //                POST - ROUTES                 //
 // ///////////////////////////////////////////////
-
-// ---------POST /PETITION ROUTE --------//
+// -------------------------POST /PETITION ROUTE ---------------------------//
 app.post("/petition", (req, res) => {
+    let {first, last, signature} = req.body;
     //If the body.signature is true do the following
-    if (req.body.signature) {
+    if (first && last && signature) {
         //DB.js request to INSERT DATA
-        db.addSig(req.body.first, req.body.last, req.body.signature)
-            .then( () => {
+        database.addSig(first, last, signature)
+            .then( dataFromDB => {
+                //RETURNING USER ID FROM DB AND STORING IN COOKIE
+                const userId = dataFromDB.rows[0].id;
+                req.session.userId = userId;
                 //After successful request redirect to signed
                 res.redirect("/petition/signed");
             })
@@ -129,36 +174,6 @@ app.post("/petition", (req, res) => {
 //     //if the PW matche you will want to redurec to /petition, will want to set req.session.userID
 //     //if PW does not match we will want to trigger or send and error msg
 // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //////////////////////////////////////////////////
