@@ -6,7 +6,7 @@ console.log("Script.JS WORKING!");
     var ctx = canvas.getContext("2d");
     var canvasDraw = $(canvas);
     var rstbutn = $('#resetsign');
-    var hiddeninput = $("hiddeninput");
+    var hiddeninput = $("#hiddeninput");
 
 
     var canvasx = $(canvas).offset().left;
@@ -24,7 +24,7 @@ console.log("Script.JS WORKING!");
     canvasDraw.on("mouseup", function() {
         mousedown = false;
         signatureImage = canvas.toDataURL();
-        $(hiddeninput).val(signatureImage);
+        hiddeninput.val(signatureImage);
     });
 
     canvasDraw.on("mousemove", function(e) {

@@ -19,9 +19,10 @@ canvas {
 }
 h1 {
     text-align: center;
-    margin-left: 300px;
-    margin-right: 300px;
+    margin-left: 50px;
+    margin-right: 50px;
 }
+
 #main-image {
     height: 300px;
     width: 300px;
@@ -43,4 +44,8 @@ button {
     border-radius: 10px;
     background-color: slategray;
     color: white;
+}
+.error {
+    color: red;
+    padding: 20px;
 }

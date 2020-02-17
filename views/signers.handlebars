@@ -1,0 +1,10 @@
+<img id="main-image" src="/images/main.png" alt="">
+
+<h3>We the undersigned demand that action must be taken to prevent XYZ</h3>
+{{#allSigners}}
+<div class="all-signers">
+        <p>{{first}} {{last}}</p>
+</div>
+{{/allSigners}}
+
+<button type="button" onclick="window.location.href = '/petition/signed';" name="back-button">Go Back</button>
