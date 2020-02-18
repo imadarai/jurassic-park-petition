@@ -5,28 +5,36 @@ const secrets = require('./secrets');
 const db = spicedPg(`postgres://${secrets.id}:${secrets.pass}@localhost:5432/petition`);
 
 
-module.exports.addSig = function (first, last, signature) {
+module.exports.addSig = function (signature, userId) {
     return db.query(
-        'INSERT INTO petition (first, last, signature) VALUES ($1, $2, $3) RETURNING id',
-        [first, last, signature],
+        'INSERT INTO petition (signature, user_id) VALUES ($1, $2) RETURNING id',
+        [signature, userId],
     );
 };
 
-exports.selectAll = function() {
+module.exports.getSig = function(userIdFromCookie) {
     return db.query(
-        `SELECT * FROM petition`
-    );
-};
-
-exports.getSig = function(userIdFromCookie) {
-    return db.query(
-        `SELECT signature FROM petition WHERE id = $1 `,
+        `SELECT signature FROM petition WHERE user_id = $1 `,
         [userIdFromCookie]
     );
 };
 
-// module.exports.totalCount = function() {
-//     return db.query(
-//         `SELECT COUNT(*) AS "count" FROM petition`
-//     );
-// };
+module.exports.selectAll = function() {
+    return db.query(
+        `SELECT * FROM users`
+    );
+};
+
+module.exports.createUser = function (first, last, email, hashedPassword) {
+    return db.query(
+        'INSERT INTO users (first, last, email, password) VALUES ($1, $2, $3, $4) RETURNING id',
+        [first, last, email, hashedPassword],
+    );
+};
+
+module.exports.getPassword = function(emailFromLoginPage) {
+    return db.query(
+        `SELECT id, first, last, password FROM users WHERE email = $1`,
+        [emailFromLoginPage]
+    );
+};

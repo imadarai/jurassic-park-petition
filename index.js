@@ -3,7 +3,7 @@ const app = express();
 const database = require('./utils/db.js');
 var cookieSession = require('cookie-session');
 const csurf = require('csurf');
-// const {hash, compare} = require("./utils/bc.js");
+const {hash, compare} = require("./utils/bc.js");
 
 
 
@@ -40,6 +40,7 @@ app.use(csurf());
 // ///////////////////////////////////////////////
 app.use((req, res, next) => {
     res.locals.csrfToken = req.csrfToken();
+    res.set('x-frame-options', 'DENY');
     next();
 });
 
@@ -54,28 +55,40 @@ app.use((req, res, next) => {
 
 // ---------------------------------MAIN ROUTE -------------------------------//
 app.get("/", (req, res) => {
+    if (req.session.userId) {
+        res.redirect("/petition/signed");
+    } else {
     //redirecting all traffice to /petition page
-    res.redirect("/petition");
+        res.redirect("/registration");
+    }
 });
 // ------------------------------/PETIRION ROUTE -----------------------------//
 app.get("/petition", (req, res) => {
-    //Check for Cookie Session
-    if (req.session.userId) {
-        res.redirect("/petition/signed");
+    // Check for Cookie Session
+    if (!req.session.userId) {
+        res.redirect("/registration");
 
     } else {
-        //rendering petition page using petition.handlebars
-        res.render ("petition", {
-            layout: "main",
-        });
-
+        database.getSig(req.session.userId).then( results => {
+            //if there is nothign in the result row
+            if (results.rows.length == 0) {
+                //rendering petition page using petition.handlebars
+                res.render ("petition", {
+                    layout: "main",
+                    first: req.session.first,
+                    last: req.session.last
+                });
+            } else {
+                res.redirect("/petition/signed");
+            }
+        }).catch(err => console.log("Err in getSig on /login: ", err));
     }
 });
 // -------------------------/PETITION/SIGNED ROUTE ---------------------------//
 app.get("/petition/signed", (req, res) => {
     //Check for Cookie Session
     if (!req.session.userId) {
-        res.redirect("/petition");
+        res.redirect("/registration");
     } else {
         //DB request to pull all data ROWS
         database.selectAll().then(result => {
@@ -90,16 +103,18 @@ app.get("/petition/signed", (req, res) => {
                     layout: "main",
                     //passing data for Signature Count and Signature Image
                     totalNumSignatures: totalNumSignatures,
-                    sigImage : sigImage
+                    sigImage : sigImage,
+                    first: req.session.first,
+                    last: req.session.last
                 });
-            }).catch(err => console.log(err));
+            }).catch(err => console.log("Err in getSig in /petition/signed route: ", err));
         });
     }
 });
 // -------------------------/PETIRION/SIGNERS ROUTE ---------------------------//
 app.get("/petition/signers", (req, res) => {
     if (!req.session.userId) {
-        res.redirect("/petition");
+        res.redirect("/registration");
 
     } else {
     //db request to pull all data on ROWS
@@ -116,7 +131,20 @@ app.get("/petition/signers", (req, res) => {
             });
     }
 });
-
+// -------------------------/REGSITRATION ROUTE ---------------------------//
+app.get("/registration", (req, res) => {
+    //rendering registration page using registration.handlebars
+    res.render ("registration", {
+        layout: "main",
+    });
+});
+// -------------------------/LOGIN ROUTE ---------------------------//
+app.get("/login", (req, res) => {
+    //rendering registration page using registration.handlebars
+    res.render ("login", {
+        layout: "main",
+    });
+});
 
 
 
@@ -126,16 +154,12 @@ app.get("/petition/signers", (req, res) => {
 // ///////////////////////////////////////////////
 // -------------------------POST /PETITION ROUTE ---------------------------//
 app.post("/petition", (req, res) => {
-    let {first, last, signature} = req.body;
+    let {signature} = req.body;
     //If the body.signature is true do the following
-    if (first && last && signature) {
+    if (signature) {
         //DB.js request to INSERT DATA
-        database.addSig(first, last, signature)
-            .then( dataFromDB => {
-                //RETURNING USER ID FROM DB AND STORING IN COOKIE
-                const userId = dataFromDB.rows[0].id;
-                req.session.userId = userId;
-                //After successful request redirect to signed
+        database.addSig(signature, req.session.userId)
+            .then( () => {
                 res.redirect("/petition/signed");
             })
             //if DB error occurs catch
@@ -143,37 +167,61 @@ app.post("/petition", (req, res) => {
     } else {
         res.render("petition", {
             layout: "main",
-            error: "error",
+            first: req.session.first,
+            last: req.session.last,
+            error: "error"
         });
     }
 });
 
+// ----------------------POST /REGISTRATION ROUTE ---------------------------//
+app.post("/registration", (req, res) => {
+    const { first, last, email, password } = req.body;
+    if (first && last && email && password) {
+        hash(password)
+            .then(hashedPassword => {
+                console.log("Hashed Password from /registration: ", hashedPassword);
+                database.createUser(first, last, email, hashedPassword)
+                    .then(result => {
+                        const userId = result.rows[0].id;
+                        // sets cookie to remember
+                        req.session.userId = userId;
+                        res.redirect('/login');
+                    }).catch(err => console.log(err));
+            });
+    } else {
+        res.render("registration", {
+            layout: "main",
+            error: "error",
+        });
+    }
+});
+// ----------------------POST /LOGIN ROUTE ---------------------------//
+app.post("/login", (req, res) => {
+    const {email, password} = req.body;
+    database.getPassword(email)
+        .then(results =>{
+            //SETTING COOKIE INFORMATION
+            req.session.userId = results.rows[0].id;
+            req.session.first = results.rows[0].first;
+            req.session.last = results.rows[0].last;
+            //Compare() to check if Password is correct
+            compare(password, results.rows[0].password).then( results =>{
+                if (results) {
+                    //If result retrun True - forward to Petition
+                    res.redirect('/petition');
+                } else {
+                    //if results return false - reload with error message
+                    res.render ("login", {
+                        layout: "main",
+                        error: "error"
+                    });
+                }
+                console.log("Is the password correct: ", results);
+            }).catch(err => console.log("Err in password compare() : ", err));
+        }).catch(err => console.log("Err in getPassword : ",err));
+});
 
-// app.post('/register', (req, res) => {
-//     //you will want to grav the user password provided, i.r. sht like req.body.Password
-//     //USE hash to take user input created ithe hased version of PW to stroe in debug
-//     hash('password').then(hashedPW => {
-//         console.log("hasedPW from /register,", hashedPW);
-//         //you are going to want to stoer this in your DB table
-//
-//         res.sendStatus(200);
-//         //you will want o redurec and not send a success status
-//     });
-// });
-//
-// app.post('/login', (req, res) => {
-//     //here you will want ot use compare, compare takes two argument, 1st is the
-//     // password privded by user and second is the hashedpw from DB
-//     //If these passwords match compare returns true, otherqise it returns falase
-//     const hashFromDb = 'test';
-//     compare('userInput', hashFromDb).then( matchValue => {
-//         console.log("matchValue of compare: ", matchValue);
-//
-//         res.sendStatus(200);
-//     });
-//     //if the PW matche you will want to redurec to /petition, will want to set req.session.userID
-//     //if PW does not match we will want to trigger or send and error msg
-// });
 
 
 //////////////////////////////////////////////////

@@ -1,0 +1,30 @@
+<h1>This petition is about something I haven't thought about.  But this is going to be a tag line.</h1>
+
+<img id="main-image" src="/images/main.png" alt="">
+
+{{#if error}}
+    <span class="error">All fields are required</span>
+{{/if}}
+
+<div class="input-container">
+    <form class="input" method="POST">
+        <!-- Input Fiels -->
+       <input type="text" name="first" placeholder="First Name">
+       <br>
+       <input type="text" name="last" placeholder="Last Name">
+       <br>
+       <input type="email" name="email" placeholder="Email">
+       <br>
+       <input type="password" name="password" placeholder="Password">
+       <br>
+       <!-- BUTTONS -->
+       <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+       <!-- buttons -->
+       <div class="button-container">
+           <button id="register">JOIN OUR CAUSE!</button>
+       </div>
+    </form>
+</div>
+<br>
+<h4>Already a member? <a href="/login">Login Here</a> </h4>

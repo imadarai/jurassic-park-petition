@@ -2,21 +2,20 @@
 
 <img id="main-image" src="/images/main.png" alt="">
 
+
+<p class="petition-text">I, {{first}} {{last}}, demand that the Commisionser of Nature County allocate funds for a new park in the Adventure District.
+    This district does not have any parks.  Our children need to have a place where they can experience nature and play outdoors.</p>
+<br>
 {{#if error}}
-    <span class="error">All fields are required</span>
+    <span class="error">Signature is required</span>
 {{/if}}
 
 <div class="input-container">
     <form class="input" method="POST">
-        <!-- Input Fiels -->
-       <input type="text" name="first" placeholder="First Name">
-       <br>
-       <input type="text" name="last" placeholder="Last Name">
-       <br>
        <!-- CANVAS -->
        <canvas id="canvas" width="610px" height="230px"></canvas>
        <br>
-       <!-- BUTTONS -->
+       <!--HIDDEN INPUTS -->
        <input id ="hiddeninput" type="hidden" name="signature">
        <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
