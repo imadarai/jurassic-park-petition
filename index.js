@@ -49,9 +49,10 @@ app.use((req, res, next) => {
 
 
 
-//////////////////////////////////////////////////
-//                GET - ROUTES                  //
-// ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                                 GET - ROUTES                              //
+///////////////////////////////////////////////////////////////////////////////
+
 
 // ---------------------------------MAIN ROUTE -------------------------------//
 app.get("/", (req, res) => {
@@ -61,6 +62,20 @@ app.get("/", (req, res) => {
     //redirecting all traffice to /petition page
         res.redirect("/registration");
     }
+});
+// -------------------------/REGSITRATION ROUTE ------------------------------//
+app.get("/registration", (req, res) => {
+    //rendering registration page using registration.handlebars
+    res.render ("registration", {
+        layout: "main",
+    });
+});
+// ------------------------------/LOGIN ROUTE --------------------------------//
+app.get("/login", (req, res) => {
+    //rendering registration page using registration.handlebars
+    res.render ("login", {
+        layout: "main",
+    });
 });
 // ------------------------------/PETIRION ROUTE -----------------------------//
 app.get("/petition", (req, res) => {
@@ -91,7 +106,7 @@ app.get("/petition/signed", (req, res) => {
         res.redirect("/registration");
     } else {
         //DB request to pull all data ROWS
-        database.selectAll().then(result => {
+        database.selectAllSigners().then(result => {
             //set a variable to rowCount
             let totalNumSignatures = result.rowCount;
             //NESTED DB Query to pull Signature of current User
@@ -118,7 +133,7 @@ app.get("/petition/signers", (req, res) => {
 
     } else {
     //db request to pull all data on ROWS
-        database.selectAll()
+        database.selectAllSigners()
             .then( result => {
                 //variable to set all rows to pull first and last
                 let allSigners = result.rows;
@@ -131,17 +146,9 @@ app.get("/petition/signers", (req, res) => {
             });
     }
 });
-// -------------------------/REGSITRATION ROUTE ---------------------------//
-app.get("/registration", (req, res) => {
-    //rendering registration page using registration.handlebars
-    res.render ("registration", {
-        layout: "main",
-    });
-});
-// -------------------------/LOGIN ROUTE ---------------------------//
-app.get("/login", (req, res) => {
-    //rendering registration page using registration.handlebars
-    res.render ("login", {
+// -----------------------------/PROFILE ROUTE -------------------------------//
+app.get("/profile", (req, res) => {
+    res.render("profile", {
         layout: "main",
     });
 });
@@ -149,9 +156,11 @@ app.get("/login", (req, res) => {
 
 
 
-//////////////////////////////////////////////////
-//                POST - ROUTES                 //
-// ///////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                              POST - ROUTES                                //
+///////////////////////////////////////////////////////////////////////////////
 // -------------------------POST /PETITION ROUTE ---------------------------//
 app.post("/petition", (req, res) => {
     let {signature} = req.body;
@@ -183,17 +192,32 @@ app.post("/registration", (req, res) => {
                 console.log("Hashed Password from /registration: ", hashedPassword);
                 database.createUser(first, last, email, hashedPassword)
                     .then(result => {
-                        const userId = result.rows[0].id;
-                        // sets cookie to remember
-                        req.session.userId = userId;
-                        res.redirect('/login');
-                    }).catch(err => console.log(err));
+                        //SETTING COOKIE INFORMATION
+                        req.session.userId = result.rows[0].id;
+                        req.session.first = result.rows[0].first;
+                        req.session.last = result.rows[0].last;
+                        //Redirect to Profile
+                        res.redirect('/profile');
+                    }).catch(err => console.log("Err in createUser in /registration route", err));
             });
     } else {
         res.render("registration", {
             layout: "main",
             error: "error",
         });
+    }
+});
+// ----------------------POST /PROFILE ROUTE ---------------------------//
+app.post("/profile", (req, res) => {
+    let {age, city, homepage} = req.body;
+
+    if (age || city || homepage) {
+        database.addProfile(age, city, homepage, req.session.userId)
+            .then ( () => {
+                res.redirect("/petition");
+            }).catch(err => console.log("Err in addProfile: ", err));
+    } else {
+        res.redirect("/petition");
     }
 });
 // ----------------------POST /LOGIN ROUTE ---------------------------//
@@ -221,10 +245,7 @@ app.post("/login", (req, res) => {
             }).catch(err => console.log("Err in password compare() : ", err));
         }).catch(err => console.log("Err in getPassword : ",err));
 });
-
-
-
-//////////////////////////////////////////////////
-//          SERVER LISTENING ON NODE.JS         //
-// ///////////////////////////////////////////////
-app.listen(8080, () => console.log("Petition Server is running!"));
+///////////////////////////////////////////////////////////////////////////////
+//                        SERVER LISTENING ON NODE.JS                        //
+// ///////////////////////////////////////////////// //////////////////////////
+app.listen(process.env.PORT || 8080, () => console.log("Petition Server is running!"));
