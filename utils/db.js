@@ -5,16 +5,16 @@ const spicedPg = require('spiced-pg');
 //                 DATABASE PORTS FOR LOCAL AND HEROKU                       //
 ///////////////////////////////////////////////////////////////////////////////
 
-let db;
-if (process.env.DATABSE_URL){
-    db = spicedPg(process.env.DATABASE_URL);
-} else {
-    const secrets = require ('./secrets');
-    db = spicedPg(`postgres://${secrets.id}:${secrets.pass}@localhost:5432/petition`);
-}
+// let db;
+// if (process.env.DATABSE_URL){
+//     db = spicedPg(process.env.DATABASE_URL);
+// } else {
+//     const secrets = require ('./secrets');
+//     db = spicedPg(`postgres://${secrets.id}:${secrets.pass}@localhost:5432/petition`);
+// }
 
-//const db = spicedPg(`postgres://${secrets.dbUser}:${secrets.dbPass}@`);
-// const db = spicedPg(`postgres://${secrets.id}:${secrets.pass}@localhost:5432/petition`);
+// //const db = spicedPg(`postgres://${secrets.dbUser}:${secrets.dbPass}@`);
+const db = spicedPg(process.env.DATABSE_URL || `postgres://postgres:postgres@localhost:5432/petition`);
 
 ///////////////////////////////////////////////////////////////////////////////
 //               DATABASE REQUEST FOR --- SIGNATURE TABLE                    //
