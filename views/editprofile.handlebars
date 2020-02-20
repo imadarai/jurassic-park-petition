@@ -1,0 +1,40 @@
+<h1>This petition is about something I haven't thought about.  But this is going to be a tag line.</h1>
+
+<img id="main-image" src="/images/main.png" alt="">
+
+{{#if error}}
+    <span class="error">There was an error.  Please try again</span>
+{{/if}}
+{{#if successfullyUpdated}}
+    <span class="error">Your Profile has been updated.</span>
+{{/if}}
+
+{{#profileInfo}}
+<div class="input-container">
+    <form class="input" method="POST">
+        <!-- Input Fiels -->
+        <input type="text" name="first" placeholder="First Name" value="{{first}}">
+        <br>
+        <input type="text" name="last" placeholder="Last Name" value="{{last}}">
+        <br>
+        <input type="email" name="email" placeholder="Email" value="{{email}}">
+        <br>
+        <input type="password" name="password" placeholder="Update Password">
+        <br>
+        <input type="number" name="age" placeholder="Age" value="{{age}}">
+        <br>
+        <input type="text" name="city" placeholder="City" value="{{city}}">
+        <br>
+        <input type="url" name="homepage" placeholder="https://www.homepage.com" value="{{url}}">
+        <!-- Hidden Fields -->
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+       <!-- buttons -->
+       <div class="button-container">
+           <button id="register">Update Profile</button>
+           <a href="/delete"><button id="register">Delete Account</button></a>
+       </div>
+    </form>
+
+</div>
+{{/profileInfo}}

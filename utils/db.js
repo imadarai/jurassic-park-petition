@@ -22,6 +22,13 @@ module.exports.getSig = function(userIdFromCookie) {
         [userIdFromCookie]
     );
 };
+module.exports.deleteSignature = function (userId) {
+    return db.query(
+        `DELETE FROM petition
+        WHERE user_Id=$1`,
+        [userId]
+    );
+};
 ///////////////////////////////////////////////////////////////////////////////
 //                  DATABASE REQUEST FOR --- USERS TABLE                     //
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,9 +38,17 @@ module.exports.createUser = function (first, last, email, hashedPassword) {
         [first, last, email, hashedPassword],
     );
 };
+module.exports.updateUserTable = function (first, last, email, password, userId) {
+    return db.query(
+        `UPDATE users
+        SET first = $1, last = $2, email = $3, password = $4
+        WHERE id=$5`,
+        [first, last, email, password, userId]
+    );
+};
 module.exports.selectAllSigners = function() {
     return db.query(
-        `SELECT users.first, users.last, profile.age, profile.city, profile.url
+        `SELECT users.first, users.last,users.email, profile.age, profile.city, profile.url
         FROM users
         LEFT JOIN profile
         ON users.id = profile.user_id
@@ -59,6 +74,13 @@ module.exports.getPassword = function(emailFromLoginPage) {
         [emailFromLoginPage]
     );
 };
+module.exports.deleteUser = function (userId) {
+    return db.query(
+        `DELETE FROM users
+        WHERE id=$1`,
+        [userId]
+    );
+};
 ///////////////////////////////////////////////////////////////////////////////
 //               DATABASE REQUEST FOR --- PROFILE TABLE                      //
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,5 +88,32 @@ module.exports.addProfile = function (age, city, homepage, userId) {
     return db.query(
         'INSERT INTO profile (age, city, url, user_id) VALUES ($1, $2, $3, $4)',
         [age || null, city || null, homepage || null, userId],
+    );
+};
+module.exports.selectProfileById = function(userId) {
+    return db.query(
+        `SELECT users.first, users.last,users.email, profile.age, profile.city, profile.url
+        FROM users
+        LEFT JOIN profile
+        ON users.id = profile.user_id
+        WHERE users.id = $1`,
+        [userId]
+    );
+};
+module.exports.updateProfileTable = function (age, city, homepage, userId) {
+    return db.query(
+        `INSERT INTO profiles (age, city, homepage, userid)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (userId)
+        DO UPDATE SET age = $1, city = $2, homepage = $3;
+        `,
+        [age, city, homepage, userId]
+    );
+};
+module.exports.deleteProfile = function (userId) {
+    return db.query(
+        `DELETE FROM profile
+        WHERE user_Id=$1`,
+        [userId]
     );
 };

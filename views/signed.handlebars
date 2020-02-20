@@ -6,4 +6,13 @@
         This district does not have any parks.  Our children need to have a place where they can experience nature and play outdoors.</p>
         <br>
     <img src="{{sigImage}}" alt="">
+
+    <br>
     <p><a href="/petition/signers">See all {{totalNumSignatures}} Signatures</a></p>
+    <br>
+    <form class="input" method="POST">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <div class="button-container">
+            <button id="register">Delete Signature</button>
+        </div>
+    </form>

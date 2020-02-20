@@ -1,5 +1,5 @@
 const express = require ('express');
-const app = express();
+const app = exports.app = express();
 const database = require('./utils/db.js');
 var cookieSession = require('cookie-session');
 const csurf = require('csurf');
@@ -52,7 +52,22 @@ app.use((req, res, next) => {
 ///////////////////////////////////////////////////////////////////////////////
 //                                 GET - ROUTES                              //
 ///////////////////////////////////////////////////////////////////////////////
-
+// ----------------------SUPER TEST DUMMY ROUTES ----------------------------//
+// app.get("/welcome", (req, res) => {
+//     res.send("<h1>hwelllwooowowowowo</h1>");
+// });
+//
+// app.post("/welcome", (req, res) => {
+//     res.session.submitted = true;
+//     res.redirect('/home');
+// });
+//
+// app.get("/home", (req, res) => {
+//     if (!req.session.submitted) {
+//         return res.redirect('/welcome');
+//     }
+//     res.send("<h1>home</h1>");
+// });
 
 // ---------------------------------MAIN ROUTE -------------------------------//
 app.get("/", (req, res) => {
@@ -164,6 +179,34 @@ app.get("/profile", (req, res) => {
         layout: "main",
     });
 });
+// -----------------------------/PROFILE/EDIT ROUTE -------------------------------//
+app.get("/profile/edit", (req, res) => {
+    database.selectProfileById(req.session.userId)
+        .then( result => {
+            //variable to set all rows to pull first and last
+            let profileInfo = result.rows;
+            //render signers page with first and last name of all signatures
+            res.render("editprofile", {
+                layout: "main",
+                //passing data
+                profileInfo
+            });
+        }).catch(err => console.log("Err in selectAllSigners on /profile/edit ", err));
+});
+// -----------------------------/DELETE ROUTE -------------------------------//
+app.get("/delete", (req, res) => {
+    database.deleteSignature(req.session.userId)
+        .then(database.deleteProfile(req.session.userId)
+            .then(database.deleteUser(req.session.userId))
+            .catch(err => console.log("Err in deleting profile: ", err))
+        );
+    res.redirect("/logout");
+});
+// -----------------------------/LOGOUT ROUTE -------------------------------//
+app.get("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/registration");
+});
 
 
 
@@ -193,6 +236,12 @@ app.post("/petition", (req, res) => {
         });
     }
 });
+// -------------------------POST /PETITION ROUTE ---------------------------//
+app.post("/petition/signed", (req, res) => {
+    database.deleteSignature(req.session.userId).then(() => {
+        res.redirect("/petition");
+    });
+});
 
 // ----------------------POST /REGISTRATION ROUTE ---------------------------//
 app.post("/registration", (req, res) => {
@@ -206,6 +255,7 @@ app.post("/registration", (req, res) => {
                         req.session.userId = result.rows[0].id;
                         req.session.first = result.rows[0].first;
                         req.session.last = result.rows[0].last;
+                        req.session.password = result.rows[0].password;
                         //Redirect to Profile
                         res.redirect('/profile');
                     }).catch(err => console.log("Err in createUser in /registration route", err));
@@ -247,6 +297,7 @@ app.post("/login", (req, res) => {
             req.session.userId = results.rows[0].id;
             req.session.first = results.rows[0].first;
             req.session.last = results.rows[0].last;
+            req.session.password = results.rows[0].password;
             //Compare() to check if Password is correct
             compare(password, results.rows[0].password).then( results =>{
                 if (results) {
@@ -263,7 +314,55 @@ app.post("/login", (req, res) => {
             }).catch(err => console.log("Err in password compare() : ", err));
         }).catch(err => console.log("Err in getPassword : ",err));
 });
+// ----------------------POST /PROFILE/EDIT ROUTE ----------------------------//
+app.post("/profile/edit", (req, res) => {
+    let {first, last, email, password, age, city, homepage} = req.body;
+    if (!password) {
+        database.updateUserTable(first, last, email, req.session.password ,req.session.userId)
+            .then ( () => {
+                database.updateProfileTable(age, city, homepage, req.session.userId);
+            }).then( () => {
+                res.render("editprofile", {
+                    layout: "main",
+                    //passing data
+                    status: "successfullyUpdated"
+                });
+            }).catch(err =>{
+                console.log("Err in profile update with no Password : ", err);
+                res.render("editprofile", {
+                    layout: "main",
+                    //passing data
+                    error: "error"
+                });
+            }
+            );
+
+    } else {
+        hash(password).then(hashedPassword => {
+            database.updateUserTable(first, last, email, hashedPassword, req.session.userId)
+                .then ( () => {
+                    database.updateProfileTable(age, city, homepage, req.session.userId);
+                }).then( () => {
+                    res.render("editprofile", {
+                        layout: "main",
+                        //passing data
+                        status: "successfullyUpdated"
+                    });
+                }).catch(err =>{
+                    console.log("Err in profile update with no Password : ", err);
+                    res.render("editprofile", {
+                        layout: "main",
+                        //passing data
+                        error: "error"
+                    });
+                }
+                );
+        });
+    }
+});
 ///////////////////////////////////////////////////////////////////////////////
 //                        SERVER LISTENING ON NODE.JS                        //
 // ///////////////////////////////////////////////// //////////////////////////
-app.listen(process.env.PORT || 8080, () => console.log("Petition Server is running!"));
+if (require.main === module){
+    app.listen(process.env.PORT || 8080, () => console.log("Petition Server is running!"));
+}
