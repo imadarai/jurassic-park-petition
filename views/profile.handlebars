@@ -2,6 +2,10 @@
 
 <img id="main-image" src="/images/main.png" alt="">
 
+{{#if error}}
+    <span class="error">Please enter a valid URL</span>
+{{/if}}
+
 <div class="input-container">
     <form class="input" method="POST">
         <!-- Input Fiels -->
@@ -9,7 +13,7 @@
        <br>
        <input type="text" name="city" placeholder="City">
        <br>
-       <input type="url" name="homepage" placeholder="https://www.homepage.com">
+       <input type="text" name="homepage" placeholder="https://www.homepage.com">
        <!-- BUTTONS -->
        <input type="hidden" name="_csrf" value="{{csrfToken}}">
 

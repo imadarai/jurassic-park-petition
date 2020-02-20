@@ -56,12 +56,8 @@ app.use((req, res, next) => {
 
 // ---------------------------------MAIN ROUTE -------------------------------//
 app.get("/", (req, res) => {
-    if (req.session.userId) {
-        res.redirect("/petition/signed");
-    } else {
-    //redirecting all traffice to /petition page
-        res.redirect("/registration");
-    }
+    res.redirect("/registration");
+
 });
 // -------------------------/REGSITRATION ROUTE ------------------------------//
 app.get("/registration", (req, res) => {
@@ -143,6 +139,22 @@ app.get("/petition/signers", (req, res) => {
                     //passing data
                     allSigners
                 });
+            }).catch(err => console.log("Err in selectAllSigners on /petition/signers: ", err));
+    }
+});
+// -----------------------/SIGNERS/:CITY ROUTE -------------------------------//
+app.get("/petition/signers/:city", (req, res) => {
+    if (!req.session.userId) {
+        res.redirect("/registration");
+    } else {
+        database.filterByCity(req.params.city)
+            .then( result => {
+                let allSigners = result.rows;
+                res.render("signers", {
+                    layout: "main",
+                    allSigners
+                });
+            }).catch(err => {console.log("Err in filterByCity on req.param route: ", err);
             });
     }
 });
@@ -152,7 +164,6 @@ app.get("/profile", (req, res) => {
         layout: "main",
     });
 });
-
 
 
 
@@ -189,7 +200,6 @@ app.post("/registration", (req, res) => {
     if (first && last && email && password) {
         hash(password)
             .then(hashedPassword => {
-                console.log("Hashed Password from /registration: ", hashedPassword);
                 database.createUser(first, last, email, hashedPassword)
                     .then(result => {
                         //SETTING COOKIE INFORMATION
@@ -211,13 +221,21 @@ app.post("/registration", (req, res) => {
 app.post("/profile", (req, res) => {
     let {age, city, homepage} = req.body;
 
-    if (age || city || homepage) {
+    if (!age && !city && !homepage) {
+        res.redirect('/petition');
+    } else {
+        if (homepage){
+            if(!homepage.startsWith("http://") && !homepage.startsWith("https://") && !homepage.startsWith("//")){
+                return res.render("profile", {
+                    layout: "main",
+                    error: "error"
+                });
+            }
+        }
         database.addProfile(age, city, homepage, req.session.userId)
             .then ( () => {
                 res.redirect("/petition");
             }).catch(err => console.log("Err in addProfile: ", err));
-    } else {
-        res.redirect("/petition");
     }
 });
 // ----------------------POST /LOGIN ROUTE ---------------------------//
