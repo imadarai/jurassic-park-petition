@@ -4,7 +4,7 @@ const database = require('./utils/db.js');
 var cookieSession = require('cookie-session');
 const csurf = require('csurf');
 const {hash, compare} = require("./utils/bc.js");
-
+const { requireLoggedOutUser, requireLoggedInUser } = require('./utils/middleware.js');
 
 
 
@@ -70,117 +70,98 @@ app.use((req, res, next) => {
 // });
 
 // ---------------------------------MAIN ROUTE -------------------------------//
-app.get("/", (req, res) => {
+app.get("/", requireLoggedOutUser, (req, res) => {
     res.redirect("/registration");
 
 });
 // -------------------------/REGSITRATION ROUTE ------------------------------//
-app.get("/registration", (req, res) => {
+app.get("/registration",  requireLoggedOutUser,  (req, res) => {
     //rendering registration page using registration.handlebars
     res.render ("registration", {
         layout: "main",
     });
 });
 // ------------------------------/LOGIN ROUTE --------------------------------//
-app.get("/login", (req, res) => {
+app.get("/login", requireLoggedOutUser,  (req, res) => {
     //rendering registration page using registration.handlebars
     res.render ("login", {
         layout: "main",
     });
 });
 // ------------------------------/PETIRION ROUTE -----------------------------//
-app.get("/petition", (req, res) => {
+app.get("/petition", requireLoggedInUser, (req, res) => {
     // Check for Cookie Session
-    if (!req.session.userId) {
-        res.redirect("/registration");
-
-    } else {
-        database.getSig(req.session.userId).then( results => {
-            //if there is nothign in the result row
-            if (results.rows.length == 0) {
-                //rendering petition page using petition.handlebars
-                res.render ("petition", {
-                    layout: "main",
-                    first: req.session.first,
-                    last: req.session.last
-                });
-            } else {
-                res.redirect("/petition/signed");
-            }
-        }).catch(err => console.log("Err in getSig on /login: ", err));
-    }
+    database.getSig(req.session.userId).then( results => {
+        //if there is nothign in the result row
+        if (results.rows.length == 0) {
+            //rendering petition page using petition.handlebars
+            res.render ("petition", {
+                layout: "main",
+                first: req.session.first,
+                last: req.session.last
+            });
+        } else {
+            res.redirect("/petition/signed");
+        }
+    }).catch(err => console.log("Err in getSig on /login: ", err));
 });
 // -------------------------/PETITION/SIGNED ROUTE ---------------------------//
-app.get("/petition/signed", (req, res) => {
-    //Check for Cookie Session
-    if (!req.session.userId) {
-        res.redirect("/registration");
-    } else {
-        //DB request to pull all data ROWS
-        database.selectAllSigners().then(result => {
-            //set a variable to rowCount
-            let totalNumSignatures = result.rowCount;
-            //NESTED DB Query to pull Signature of current User
-            database.getSig(req.session.userId).then( results => {
-                //SET VARIABLE TO STORE IMAGE
-                let sigImage = results.rows[0].signature;
-                //Rendering /peititon/signed page
-                res.render("signed", {
-                    layout: "main",
-                    //passing data for Signature Count and Signature Image
-                    totalNumSignatures: totalNumSignatures,
-                    sigImage : sigImage,
-                    first: req.session.first,
-                    last: req.session.last
-                });
-            }).catch(err => console.log("Err in getSig in /petition/signed route: ", err));
-        });
-    }
+app.get("/petition/signed", requireLoggedInUser, (req, res) => {
+    //DB request to pull all data ROWS
+    database.selectAllSigners().then(result => {
+        //set a variable to rowCount
+        let totalNumSignatures = result.rowCount;
+        //NESTED DB Query to pull Signature of current User
+        database.getSig(req.session.userId).then( results => {
+            //SET VARIABLE TO STORE IMAGE
+            let sigImage = results.rows[0].signature;
+            //Rendering /peititon/signed page
+            res.render("signed", {
+                layout: "main",
+                //passing data for Signature Count and Signature Image
+                totalNumSignatures: totalNumSignatures,
+                sigImage : sigImage,
+                first: req.session.first,
+                last: req.session.last
+            });
+        }).catch(err => console.log("Err in getSig in /petition/signed route: ", err));
+    });
 });
 // -------------------------/PETIRION/SIGNERS ROUTE ---------------------------//
-app.get("/petition/signers", (req, res) => {
-    if (!req.session.userId) {
-        res.redirect("/registration");
-
-    } else {
+app.get("/petition/signers", requireLoggedInUser, (req, res) => {
     //db request to pull all data on ROWS
-        database.selectAllSigners()
-            .then( result => {
-                //variable to set all rows to pull first and last
-                let allSigners = result.rows;
-                //render signers page with first and last name of all signatures
-                res.render("signers", {
-                    layout: "main",
-                    //passing data
-                    allSigners
-                });
-            }).catch(err => console.log("Err in selectAllSigners on /petition/signers: ", err));
-    }
+    database.selectAllSigners()
+        .then( result => {
+            //variable to set all rows to pull first and last
+            let allSigners = result.rows;
+            //render signers page with first and last name of all signatures
+            res.render("signers", {
+                layout: "main",
+                //passing data
+                allSigners
+            });
+        }).catch(err => console.log("Err in selectAllSigners on /petition/signers: ", err));
 });
 // -----------------------/SIGNERS/:CITY ROUTE -------------------------------//
-app.get("/petition/signers/:city", (req, res) => {
-    if (!req.session.userId) {
-        res.redirect("/registration");
-    } else {
-        database.filterByCity(req.params.city)
-            .then( result => {
-                let allSigners = result.rows;
-                res.render("signers", {
-                    layout: "main",
-                    allSigners
-                });
-            }).catch(err => {console.log("Err in filterByCity on req.param route: ", err);
+app.get("/petition/signers/:city", requireLoggedInUser, (req, res) => {
+    database.filterByCity(req.params.city)
+        .then( result => {
+            let allSigners = result.rows;
+            res.render("signers", {
+                layout: "main",
+                allSigners
             });
-    }
+        }).catch(err => {console.log("Err in filterByCity on req.param route: ", err);
+        });
 });
 // -----------------------------/PROFILE ROUTE -------------------------------//
-app.get("/profile", (req, res) => {
+app.get("/profile", requireLoggedInUser, (req, res) => {
     res.render("profile", {
         layout: "main",
     });
 });
 // -----------------------------/PROFILE/EDIT ROUTE -------------------------------//
-app.get("/profile/edit", (req, res) => {
+app.get("/profile/edit", requireLoggedInUser, (req, res) => {
     database.selectProfileById(req.session.userId)
         .then( result => {
             //variable to set all rows to pull first and last
@@ -194,7 +175,7 @@ app.get("/profile/edit", (req, res) => {
         }).catch(err => console.log("Err in selectAllSigners on /profile/edit ", err));
 });
 // -----------------------------/DELETE ROUTE -------------------------------//
-app.get("/delete", (req, res) => {
+app.get("/delete", requireLoggedInUser, (req, res) => {
     database.deleteSignature(req.session.userId)
         .then(database.deleteProfile(req.session.userId)
             .then(database.deleteUser(req.session.userId))
@@ -205,7 +186,13 @@ app.get("/delete", (req, res) => {
 // -----------------------------/LOGOUT ROUTE -------------------------------//
 app.get("/logout", (req, res) => {
     req.session = null;
-    res.redirect("/registration");
+    res.redirect("/login");
+});
+// -----------------------------/* for 404 ROUTE -------------------------------//
+app.get("*", (req, res) => {
+    res.render ("404", {
+        layout: "main",
+    });
 });
 
 
@@ -216,7 +203,7 @@ app.get("/logout", (req, res) => {
 //                              POST - ROUTES                                //
 ///////////////////////////////////////////////////////////////////////////////
 // -------------------------POST /PETITION ROUTE ---------------------------//
-app.post("/petition", (req, res) => {
+app.post("/petition", requireLoggedInUser, (req, res) => {
     let {signature} = req.body;
     //If the body.signature is true do the following
     if (signature) {
@@ -237,14 +224,14 @@ app.post("/petition", (req, res) => {
     }
 });
 // -------------------------POST /PETITION ROUTE ---------------------------//
-app.post("/petition/signed", (req, res) => {
+app.post("/petition/signed", requireLoggedInUser, (req, res) => {
     database.deleteSignature(req.session.userId).then(() => {
         res.redirect("/petition");
     });
 });
 
 // ----------------------POST /REGISTRATION ROUTE ---------------------------//
-app.post("/registration", (req, res) => {
+app.post("/registration", requireLoggedOutUser,  (req, res) => {
     const { first, last, email, password } = req.body;
     if (first && last && email && password) {
         hash(password)
@@ -267,9 +254,8 @@ app.post("/registration", (req, res) => {
     }
 });
 // ----------------------POST /PROFILE ROUTE ---------------------------//
-app.post("/profile", (req, res) => {
+app.post("/profile", requireLoggedInUser, (req, res) => {
     let {age, city, homepage} = req.body;
-
     if (!age && !city && !homepage) {
         res.redirect('/petition');
     } else {
@@ -288,7 +274,7 @@ app.post("/profile", (req, res) => {
     }
 });
 // ----------------------POST /LOGIN ROUTE ---------------------------//
-app.post("/login", (req, res) => {
+app.post("/login",  requireLoggedOutUser, (req, res) => {
     const {email, password} = req.body;
     database.getPassword(email)
         .then(results =>{
@@ -319,10 +305,19 @@ app.post("/login", (req, res) => {
         });
 });
 // ----------------------POST /PROFILE/EDIT ROUTE ----------------------------//
-app.post("/profile/edit", (req, res) => {
+app.post("/profile/edit", requireLoggedInUser, (req, res) => {
     let {first, last, email, password, age, city, url} = req.body;
     let profileInfo = {first, last, email, password, age, city, url};
     if (!password) {
+        if (url){
+            if(!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("//")){
+                return res.render("editprofile", {
+                    layout: "main",
+                    url: true,
+                    profileInfo
+                });
+            }
+        }
         database.updateUserTableNoPassword(first, last, email, req.session.userId)
             .then ( () => {
                 database.updateProfileTable(age, city, url, req.session.userId);
@@ -344,6 +339,15 @@ app.post("/profile/edit", (req, res) => {
             );
 
     } else {
+        if (url){
+            if(!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("//")){
+                return res.render("editprofile", {
+                    layout: "main",
+                    url: true,
+                    profileInfo
+                });
+            }
+        }
         hash(password).then(hashedPassword => {
             database.updateUserTable(first, last, email, hashedPassword, req.session.userId)
                 .then ( () => {

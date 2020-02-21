@@ -45,6 +45,11 @@ button {
     background-color: slategray;
     color: white;
 }
+button.delete {
+    background-color: red;
+    font-size: 32;
+}
+
 .error {
     color: red;
     padding: 20px;

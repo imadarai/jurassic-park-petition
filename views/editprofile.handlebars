@@ -8,6 +8,9 @@
 {{#if successfullyUpdated}}
     <span class="error">Your Profile has been updated.</span>
 {{/if}}
+{{#if url}}
+    <span class="error">You've entered an invalid URL.</span>
+{{/if}}
 
 
 <div class="input-container">
@@ -34,8 +37,8 @@
        <!-- buttons -->
        <div class="button-container">
            <button id="register">Update Profile</button>
-           <a href="/delete"><button id="register">Delete Account</button></a>
        </div>
     </form>
+    <button class="delete">Delete Account</button>
 
 </div>
