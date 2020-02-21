@@ -3,7 +3,10 @@
 <img id="main-image" src="/images/main.png" alt="">
 
 {{#if error}}
-    <span class="error">Login or Password is incorrect.  Please Try again</span>
+    <span class="error">Password is incorrect. Please try again.</span>
+{{/if}}
+{{#if wrongId}}
+    <span class="error">Email doesn't exit.  Please try again or <a href="/register">Register</a></span>
 {{/if}}
 
 <div class="input-container">

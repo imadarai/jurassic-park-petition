@@ -46,6 +46,14 @@ module.exports.updateUserTable = function (first, last, email, password, userId)
         [first, last, email, password, userId]
     );
 };
+module.exports.updateUserTableNoPassword = function (first, last, email, userId) {
+    return db.query(
+        `UPDATE users
+        SET first = $1, last = $2, email = $3
+        WHERE id=$4`,
+        [first, last, email, userId]
+    );
+};
 module.exports.selectAllSigners = function() {
     return db.query(
         `SELECT users.first, users.last,users.email, profile.age, profile.city, profile.url
@@ -102,10 +110,10 @@ module.exports.selectProfileById = function(userId) {
 };
 module.exports.updateProfileTable = function (age, city, homepage, userId) {
     return db.query(
-        `INSERT INTO profiles (age, city, homepage, userid)
+        `INSERT INTO profile (age, city, url, user_id)
         VALUES ($1, $2, $3, $4)
-        ON CONFLICT (userId)
-        DO UPDATE SET age = $1, city = $2, homepage = $3;
+        ON CONFLICT (user_id)
+        DO UPDATE SET age = $1, city = $2, url = $3;
         `,
         [age, city, homepage, userId]
     );

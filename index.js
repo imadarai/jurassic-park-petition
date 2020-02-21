@@ -255,7 +255,6 @@ app.post("/registration", (req, res) => {
                         req.session.userId = result.rows[0].id;
                         req.session.first = result.rows[0].first;
                         req.session.last = result.rows[0].last;
-                        req.session.password = result.rows[0].password;
                         //Redirect to Profile
                         res.redirect('/profile');
                     }).catch(err => console.log("Err in createUser in /registration route", err));
@@ -297,7 +296,6 @@ app.post("/login", (req, res) => {
             req.session.userId = results.rows[0].id;
             req.session.first = results.rows[0].first;
             req.session.last = results.rows[0].last;
-            req.session.password = results.rows[0].password;
             //Compare() to check if Password is correct
             compare(password, results.rows[0].password).then( results =>{
                 if (results) {
@@ -312,20 +310,28 @@ app.post("/login", (req, res) => {
                 }
                 console.log("Is the password correct: ", results);
             }).catch(err => console.log("Err in password compare() : ", err));
-        }).catch(err => console.log("Err in getPassword : ",err));
+        }).catch(err =>{
+            console.log("Err in getPassword : ",err);
+            res.render ("login", {
+                layout: "main",
+                wrongId: true
+            });
+        });
 });
 // ----------------------POST /PROFILE/EDIT ROUTE ----------------------------//
 app.post("/profile/edit", (req, res) => {
-    let {first, last, email, password, age, city, homepage} = req.body;
+    let {first, last, email, password, age, city, url} = req.body;
+    let profileInfo = {first, last, email, password, age, city, url};
     if (!password) {
-        database.updateUserTable(first, last, email, req.session.password ,req.session.userId)
+        database.updateUserTableNoPassword(first, last, email, req.session.userId)
             .then ( () => {
-                database.updateProfileTable(age, city, homepage, req.session.userId);
+                database.updateProfileTable(age, city, url, req.session.userId);
             }).then( () => {
                 res.render("editprofile", {
                     layout: "main",
                     //passing data
-                    status: "successfullyUpdated"
+                    successfullyUpdated: true,
+                    profileInfo
                 });
             }).catch(err =>{
                 console.log("Err in profile update with no Password : ", err);
@@ -341,12 +347,13 @@ app.post("/profile/edit", (req, res) => {
         hash(password).then(hashedPassword => {
             database.updateUserTable(first, last, email, hashedPassword, req.session.userId)
                 .then ( () => {
-                    database.updateProfileTable(age, city, homepage, req.session.userId);
+                    database.updateProfileTable(age, city, url, req.session.userId);
                 }).then( () => {
                     res.render("editprofile", {
                         layout: "main",
                         //passing data
-                        status: "successfullyUpdated"
+                        successfullyUpdated: true,
+                        profileInfo
                     });
                 }).catch(err =>{
                     console.log("Err in profile update with no Password : ", err);
