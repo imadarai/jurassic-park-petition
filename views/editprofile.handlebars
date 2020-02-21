@@ -9,10 +9,13 @@
     <span class="error">Your Profile has been updated.</span>
 {{/if}}
 
-{{#profileInfo}}
+
 <div class="input-container">
     <form class="input" method="POST">
         <!-- Input Fiels -->
+        <!-- Hidden Fields -->
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        {{#profileInfo}}
         <input type="text" name="first" placeholder="First Name" value="{{first}}">
         <br>
         <input type="text" name="last" placeholder="Last Name" value="{{last}}">
@@ -26,8 +29,7 @@
         <input type="text" name="city" placeholder="City" value="{{city}}">
         <br>
         <input type="url" name="homepage" placeholder="https://www.homepage.com" value="{{url}}">
-        <!-- Hidden Fields -->
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        {{/profileInfo}}
 
        <!-- buttons -->
        <div class="button-container">
@@ -37,4 +39,3 @@
     </form>
 
 </div>
-{{/profileInfo}}
