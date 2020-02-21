@@ -41,3 +41,23 @@ test("GET /home send 200 status code as response", () => {
             expect(response.text).toBe("<h1>hwelllwooowowowowo</h1>");
         });
 });
+
+///////////////////////////////////////////////////////////////////////////////
+//                                 GET - ROUTES                              //
+///////////////////////////////////////////////////////////////////////////////
+// ----------------------SUPER TEST DUMMY ROUTES ----------------------------//
+// app.get("/welcome", (req, res) => {
+//     res.send("<h1>hwelllwooowowowowo</h1>");
+// });
+//
+// app.post("/welcome", (req, res) => {
+//     res.session.submitted = true;
+//     res.redirect('/home');
+// });
+//
+// app.get("/home", (req, res) => {
+//     if (!req.session.submitted) {
+//         return res.redirect('/welcome');
+//     }
+//     res.send("<h1>home</h1>");
+// });
