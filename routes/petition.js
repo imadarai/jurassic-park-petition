@@ -16,6 +16,7 @@ app.get("/petition", requireLoggedInUser, (req, res) => {
             //rendering petition page using petition.handlebars
             res.render ("petition", {
                 layout: "main",
+                loggedIn: true,
                 first: req.session.first,
                 last: req.session.last
             });
@@ -26,6 +27,7 @@ app.get("/petition", requireLoggedInUser, (req, res) => {
 });
 // ----------------------------------POST------------------------------------//
 app.post("/petition", requireLoggedInUser, (req, res) => {
+    console.log("Post request in /petition");
     let {signature} = req.body;
     //If the body.signature is true do the following
     if (signature) {
@@ -41,6 +43,7 @@ app.post("/petition", requireLoggedInUser, (req, res) => {
             layout: "main",
             first: req.session.first,
             last: req.session.last,
+            loggedIn: true,
             error: "error"
         });
     }
@@ -69,6 +72,7 @@ app.get("/petition/signed", requireLoggedInUser, (req, res) => {
                 //passing data for Signature Count and Signature Image
                 totalNumSignatures: totalNumSignatures,
                 sigImage : sigImage,
+                loggedIn: true,
                 first: req.session.first,
                 last: req.session.last
             });
@@ -99,6 +103,7 @@ app.get("/petition/signers", requireLoggedInUser, (req, res) => {
             //render signers page with first and last name of all signatures
             res.render("signers", {
                 layout: "main",
+                loggedIn: true,
                 //passing data
                 allSigners
             });
@@ -111,6 +116,7 @@ app.get("/petition/signers/:city", requireLoggedInUser, (req, res) => {
             let allSigners = result.rows;
             res.render("signers", {
                 layout: "main",
+                loggedIn: true,
                 allSigners
             });
         }).catch(err => {console.log("Err in filterByCity on req.param route: ", err);

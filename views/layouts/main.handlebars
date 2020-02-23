@@ -3,12 +3,28 @@
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" href="/styles.css">
-        <title>Petition by Imad</title>
+        <link href="https://fonts.googleapis.com/css?family=Lacquer&display=swap" rel="stylesheet">
+        <title>Petition to Re-Open Jurassic Park</title>
     </head>
     <body>
 
         <header>
-
+            {{#if loggedIn}}
+            <img id="logo" src="/images/main.png" alt="">
+            <nav>
+                <a href="/petition">3  Petition  3</a><a href="/profile/edit">3  Edit Profile  3</a><a href="/logout">3  Logout  3</a>
+            </nav>
+            {{/if}}
+            {{#if registration}}
+            <nav>
+                <a href="/login">3  Login  3</a>
+            </nav>
+            {{/if}}
+            {{#if loginPage}}
+            <nav>
+                <a href="/registration">3  Register  3</a>
+            </nav>
+            {{/if}}
         </header>
 
         <main>
@@ -16,7 +32,7 @@
         </main>
 
         <footer>
-            
+
         </footer>
 
     </body>

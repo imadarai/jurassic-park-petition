@@ -1,19 +1,19 @@
-<h1>This petition is about something I haven't thought about.  But this is going to be a tag line.</h1>
 
-<img id="main-image" src="/images/main.png" alt="">
-
-{{#if error}}
-    <span class="error">There was an error.  Please try again</span>
-{{/if}}
-{{#if successfullyUpdated}}
-    <span class="error">Your Profile has been updated.</span>
-{{/if}}
-{{#if url}}
-    <span class="error">You've entered an invalid URL.</span>
-{{/if}}
-
+<p class="undersigned">Edit Profile</p>
 
 <div class="input-container">
+
+    <div class="error-messages">
+        {{#if error}}
+            <p class="error">There was an error.  Please try again</p>
+        {{/if}}
+        {{#if successfullyUpdated}}
+            <p class="error">Your Profile has been updated.</p>
+        {{/if}}
+        {{#if url}}
+            <p class="error">You've entered an invalid URL.</p>
+        {{/if}}
+    </div>
     <form class="input" method="POST">
         <!-- Input Fiels -->
         <!-- Hidden Fields -->
@@ -39,6 +39,5 @@
            <button id="register">Update Profile</button>
        </div>
     </form>
-    <a href="/delete"><button class="delete">Delete Account</button></a>
-
 </div>
+<a href="/delete"><button class="delete">Delete Account</button></a>

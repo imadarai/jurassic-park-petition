@@ -13,6 +13,7 @@ app.get("/registration",  requireLoggedOutUser,  (req, res) => {
     //rendering registration page using registration.handlebars
     res.render ("registration", {
         layout: "main",
+        registration: true
     });
 });
 // ---------------------------------POST--------------------------------------//
@@ -29,11 +30,19 @@ app.post("/registration", requireLoggedOutUser,  (req, res) => {
                         req.session.last = result.rows[0].last;
                         //Redirect to Profile
                         res.redirect('/profile');
-                    }).catch(err => console.log("Err in createUser in /registration route", err));
+                    }).catch(err => {
+                        console.log("Err in createUser in /registration route", err);
+                        res.render("registration", {
+                            layout: "main",
+                            registration: true,
+                            emailError: true
+                        });
+                    });
             });
     } else {
         res.render("registration", {
             layout: "main",
+            registration: true,
             error: "error",
         });
     }
@@ -46,6 +55,7 @@ app.get("/login", requireLoggedOutUser,  (req, res) => {
     //rendering registration page using registration.handlebars
     res.render ("login", {
         layout: "main",
+        loginPage: true
     });
 });
 // -----------------------------------POST -----------------------------------//
@@ -66,6 +76,7 @@ app.post("/login",  requireLoggedOutUser, (req, res) => {
                     //if results return false - reload with error message
                     res.render ("login", {
                         layout: "main",
+                        loginPage: true,
                         error: "error"
                     });
                 }
@@ -75,6 +86,7 @@ app.post("/login",  requireLoggedOutUser, (req, res) => {
             console.log("Err in getPassword : ",err);
             res.render ("login", {
                 layout: "main",
+                loginPage: true,
                 wrongId: true
             });
         });

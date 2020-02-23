@@ -1,16 +1,18 @@
-<h1>This petition is about something I haven't thought about.  But this is going to be a tag line.</h1>
 
-<img id="main-image" src="/images/main.png" alt="">
+<div class="petition-text-container">
+    <p class="petition-text">I, <span class="petition-name">{{first}} {{last}}</span>,
+        demand that Sistema Nacional de Areas de Conservacion of Costa Rica allocate funds to
+        re-open Jurassic Park on Isla Nublar. The mistakes made by John Hamm and his colleage Dennis
+        Nedry, can be un-done based on todays automation technology.Our children need to have a place
+        where they can experience Jurassic Era animals and witness fierce predators like Tyrannosaurus.</p>
 
-
-<p class="petition-text">I, {{first}} {{last}}, demand that the Commisionser of Nature County allocate funds for a new park in the Adventure District.
-    This district does not have any parks.  Our children need to have a place where they can experience nature and play outdoors.</p>
-<br>
-{{#if error}}
-    <span class="error">Signature is required</span>
-{{/if}}
-
+</div>
 <div class="input-container">
+    <div class="error-messages">
+        {{#if error}}
+            <p class="error">Signature is required</p>
+        {{/if}}
+    </div>
     <form class="input" method="POST">
        <!-- CANVAS -->
        <canvas id="canvas" width="610px" height="230px"></canvas>
@@ -21,7 +23,7 @@
 
        <!-- buttons -->
        <div class="button-container">
-           <button type= "button" id="resetsign" >Reset Signature</button>
+           <button type= "button" id="resetsign" >Reset</button>
            <br>
            <button id="submit">Submit</button>
        </div>

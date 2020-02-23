@@ -1,15 +1,33 @@
 *{
     box-sizing: border-box;
     margin: 0;
+    background-color: #f8d340;
+
+}
+
+@font-face {
+ font-family: 'jurassic';
+  src: url("/Jurassic Park.ttf");
 }
 
 body {
-    background-color: white;
+
+}
+
+header {
+    font-family: 'jurassic';
+    font-size: 36px;
+    word-spacing: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
 }
 
 main {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
 }
 
@@ -17,34 +35,120 @@ canvas {
     background-color: #f0f0f0;
     border: 3px solid black;
 }
-h1 {
-    text-align: center;
-    margin-left: 50px;
-    margin-right: 50px;
+
+a {
+    color: #eb0b0b;
+    text-decoration: none;
 }
 
-#main-image {
-    height: 300px;
-    width: 300px;
+a:hover
+{
+     color:red;
+     text-decoration:none;
+     cursor:pointer;
 }
 
-form {
+ p {
+     font-family: "jurassic";
+     font-size: 36px;
+     word-spacing: 5px;
+     color: red;
+     /* text-shadow: -1px 0 yellow, 0 1px yellow, 1px 0 yellow, 0 -1px yellow; */
+     font-size: 40px;
+ }
+.petition-text-container {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    width: 1000px;
+}
+ p.petition-text {
+    text-align: center;
+ }
+ p.petition-thanks {
+     color: black;
+     font-size: 70px;
+     text-align: center;
+ }
+ p.undersigned {
+     color: black;
+     font-size: 70px;
+     text-align: center;
+ }
+
+ span.petition-name {
+     font-size: 50px;
+     text-decoration: underline;
+ }
+ span.see-all-number {
+     font-size: 26px;
+     font-family: 'Lacquer' ;
+ }
+
+#main-image {
+    display: flex;
+    justify-content: center;
     align-items: center;
+    padding: 50px;
+}
+img#logo {
+    height: 200px;
+    width: auto;
+}
+
+img.signed-image {
+    border: 1px black dotted;
+}
+.input-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border: 1px white solid;
+}
+form {
+    /* display: flex;
+    flex-direction: column;
+    align-items: center; */
+}
+input {
+    font-family: "jurassic";
+    font-size: 36px;
+    word-spacing: 5px;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #eb0b0b;
+    outline: 0;
+    color: $white;
+    padding: 7px 0;
+    background: transparent;
 }
 
 .button-container {
     display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 button {
-    margin: 10px;
+    font-family: "jurassic";
+    font-size: 36px;
+    word-spacing: 5px;
+    margin-top: 20px;
     padding: 10px;
     border-radius: 10px;
-    background-color: slategray;
-    color: white;
+    background-color: #eb0b0b;
+    border: none;
+    color: #f8d340;
 }
+button:hover {
+    background-color: black;
+    color:  #eb0b0b;
+    cursor: pointer;
+}
+
+
 button.delete {
     background-color: red;
     font-size: 32;

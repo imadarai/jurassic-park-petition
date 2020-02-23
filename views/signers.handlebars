@@ -1,17 +1,15 @@
-<img id="main-image" src="/images/main.png" alt="">
-
-<h3>We the undersigned demand that action must be taken to prevent XYZ</h3>
+<p class="undersigned">We the undersigned demand that Jurrasic Park must be re-opened</p>
 
 
 {{#allSigners}}
     <div class="all-signers">
         {{#if url}}
             <p>
-                <a href="{{url}}" target="_blank" >{{first}} {{last}}</a> {{age}} <a href="/petition/signers/{{city}}">{{city}}</a>
+                <a href="{{url}}" target="_blank" >{{first}} {{last}}</a> <span class="see-all-number">{{age}}</span> <a href="/petition/signers/{{city}}">{{city}}</a>
             </p>
         {{else}}
             <p>
-                {{first}} {{last}} {{age}} <a href="/petition/signers/{{city}}">{{city}}</a>
+                {{first}} {{last}} <span class="see-all-number">{{age}}</span> <a href="/petition/signers/{{city}}">{{city}}</a>
             </p>
         {{/if}}
     </div>

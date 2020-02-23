@@ -12,6 +12,7 @@ const {hash} = require("../utils/bc.js");
 app.get("/profile", requireLoggedInUser, (req, res) => {
     res.render("profile", {
         layout: "main",
+        loggedIn: true
     });
 });
 // ----------------------------------POST------------------------------------//
@@ -24,6 +25,7 @@ app.post("/profile", requireLoggedInUser, (req, res) => {
             if(!homepage.startsWith("http://") && !homepage.startsWith("https://") && !homepage.startsWith("//")){
                 return res.render("profile", {
                     layout: "main",
+                    loggedIn: true,
                     error: "error"
                 });
             }
@@ -50,6 +52,7 @@ app.get("/profile/edit", requireLoggedInUser, (req, res) => {
             //render signers page with first and last name of all signatures
             res.render("editprofile", {
                 layout: "main",
+                loggedIn: true,
                 //passing data
                 profileInfo
             });
@@ -65,6 +68,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
             if(!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("//")){
                 return res.render("editprofile", {
                     layout: "main",
+                    loggedIn: true,
                     url: true,
                     profileInfo
                 });
@@ -78,12 +82,14 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                     layout: "main",
                     //passing data
                     successfullyUpdated: true,
+                    loggedIn: true,
                     profileInfo
                 });
             }).catch(err =>{
                 console.log("Err in profile update with no Password : ", err);
                 res.render("editprofile", {
                     layout: "main",
+                    loggedIn: true,
                     //passing data
                     error: "error"
                 });
@@ -95,6 +101,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
             if(!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("//")){
                 return res.render("editprofile", {
                     layout: "main",
+                    loggedIn: true,
                     url: true,
                     profileInfo
                 });
@@ -107,6 +114,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                 }).then( () => {
                     res.render("editprofile", {
                         layout: "main",
+                        loggedIn: true,
                         //passing data
                         successfullyUpdated: true,
                         profileInfo
@@ -115,6 +123,7 @@ app.post("/profile/edit", requireLoggedInUser, (req, res) => {
                     console.log("Err in profile update with no Password : ", err);
                     res.render("editprofile", {
                         layout: "main",
+                        loggedIn: true,
                         //passing data
                         error: "error"
                     });

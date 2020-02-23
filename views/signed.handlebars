@@ -1,18 +1,25 @@
 
-    <h1>Thanks for signing our petition</h1>
-    <img id="main-image" src="/images/main.png" alt="">
+<div class="petition-text-container">
+    <p class="petition-thanks">Thanks for Signing our Petition to Re-Open Jurassic Park</p>
+    <p class="petition-thanks">333333333333333</p>
+    <p class="petition-text">I, <span class="petition-name">{{first}} {{last}}</span>,
+        demand that Sistema Nacional de Areas de Conservacion of Costa Rica allocate funds to
+        re-open Jurassic Park on Isla Nublar. The mistakes made by John Hamm and his colleage Dennis
+        Nedry, can be un-done based on todays automation technology.Our children need to have a place
+        where they can experience Jurassic Era animals and witness fierce predators like Tyrannosaurus.</p>
+</div>
 
-    <p class="petition-text">I, {{first}} {{last}}, demand that the Commisionser of Nature County allocate funds for a new park in the Adventure District.
-        This district does not have any parks.  Our children need to have a place where they can experience nature and play outdoors.</p>
-        <br>
-    <img src="{{sigImage}}" alt="">
+<div class="input-container">
 
-    <br>
-    <p><a href="/petition/signers">See all {{totalNumSignatures}} Signatures</a></p>
-    <br>
-    <form class="input" method="POST">
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        <div class="button-container">
-            <button id="register">Delete Signature</button>
-        </div>
-    </form>
+    <img class="signed-image" src="{{sigImage}}" alt="">
+       <!-- buttons -->
+       <div class="button-container">
+           <form class="input" method="POST">
+               <input type="hidden" name="_csrf" value="{{csrfToken}}">
+               <div class="button-container">
+                   <button id="register">Delete Signature</button>
+               </div>
+           </form>
+       </div>
+</div>
+    <p><a href="/petition/signers">See all <span class="see-all-number">{{totalNumSignatures}}</span> Signatures</a></p>

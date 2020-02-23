@@ -1,15 +1,16 @@
-<h1>This petition is about something I haven't thought about.  But this is going to be a tag line.</h1>
-
-<img id="main-image" src="/images/main.png" alt="">
-
-{{#if error}}
-    <span class="error">Password is incorrect. Please try again.</span>
-{{/if}}
-{{#if wrongId}}
-    <span class="error">Email doesn't exit.  Please try again or <a href="/register">Register</a></span>
-{{/if}}
+<div id="main-image">
+    <img src="/images/main.png" alt="">
+</div>
 
 <div class="input-container">
+    <div class="error-messages">
+        {{#if error}}
+            <p class="error">Password is incorrect.  Please try again.</p>
+        {{/if}}
+        {{#if wrongId}}
+            <p class="error">Wrong Email.  Please try again or <a href="/register">Register</a></p>
+        {{/if}}
+    <div>
     <form class="input" method="POST">
         <!-- Input Fiels -->
        <input type="email" name="email" placeholder="Email">
@@ -24,4 +25,3 @@
        </div>
     </form>
 </div>
-<h4>Not a member? <a href="/registration">Join here</a> </h4>
