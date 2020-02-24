@@ -55,12 +55,20 @@ app.get("/logout", (req, res) => {
     req.session = null;
     res.redirect("/login");
 });
+// -----------------------------/terms for 404 ROUTE -------------------------------//
+app.get("/terms", (req, res) => {
+    res.render ("terms", {
+        layout: "main",
+        loginPage: true
+    });
+});
 // -----------------------------/* for 404 ROUTE -------------------------------//
 app.get("*", (req, res) => {
     res.render ("404", {
         layout: "main",
     });
 });
+
 ///////////////////////////////////////////////////////////////////////////////
 //                        SERVER LISTENING ON NODE.JS                        //
 // ///////////////////////////////////////////////// //////////////////////////

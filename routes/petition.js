@@ -105,6 +105,7 @@ app.get("/petition/signers", requireLoggedInUser, (req, res) => {
                 layout: "main",
                 loggedIn: true,
                 //passing data
+                first: req.session.first,
                 allSigners
             });
         }).catch(err => console.log("Err in selectAllSigners on /petition/signers: ", err));
@@ -117,6 +118,7 @@ app.get("/petition/signers/:city", requireLoggedInUser, (req, res) => {
             res.render("signers", {
                 layout: "main",
                 loggedIn: true,
+                first: req.session.first,
                 allSigners
             });
         }).catch(err => {console.log("Err in filterByCity on req.param route: ", err);

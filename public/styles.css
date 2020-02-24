@@ -2,7 +2,6 @@
     box-sizing: border-box;
     margin: 0;
     background-color: #f8d340;
-
 }
 
 @font-face {
@@ -11,7 +10,8 @@
 }
 
 body {
-
+ display: flex;
+ flex-direction: column;
 }
 
 header {
@@ -24,6 +24,10 @@ header {
     padding: 10px;
 }
 
+footer {
+
+}
+
 main {
     display: flex;
     flex-direction: column;
@@ -34,6 +38,9 @@ main {
 canvas {
     background-color: #f0f0f0;
     border: 3px solid black;
+}
+canvas:hover {
+    cursor:url("/images/pen.png"), default;
 }
 
 a {
@@ -76,6 +83,12 @@ a:hover
      text-align: center;
  }
 
+ p.terms {
+     text-align: center;
+     font-family: 'Lacquer' ;
+     font-size: 16px;
+ }
+
  span.petition-name {
      font-size: 50px;
      text-decoration: underline;
@@ -83,6 +96,33 @@ a:hover
  span.see-all-number {
      font-size: 26px;
      font-family: 'Lacquer' ;
+ }
+ span.footer-text {
+     font-size: 26px;
+     font-family: 'Lacquer' ;
+     position: fixed;
+     padding: 10px;
+     right:0;
+     bottom: 0;
+ }
+ .tinyhands {
+     width: 339px;
+     height: auto;
+     position: fixed;
+     padding: 20px;
+     right:0;
+     bottom: 0;
+     display:none;
+ }
+ span.footer-text:hover + .tinyhands {
+     display: block;
+ }
+
+ span.canvas-text {
+     font-family: "jurassic";
+     font-size: 36px;
+     word-spacing: 5px;
+     color: black;
  }
 
 #main-image {
@@ -131,6 +171,12 @@ input {
     justify-content: space-between;
 }
 
+.update-profile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
 button {
     font-family: "jurassic";
     font-size: 36px;
@@ -148,13 +194,46 @@ button:hover {
     cursor: pointer;
 }
 
-
-button.delete {
-    background-color: red;
-    font-size: 32;
-}
-
 .error {
     color: red;
     padding: 20px;
+}
+
+.overlay {
+    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: black;
+    opacity: .9;
+    z-index: 1;
+}
+p.overlay-text {
+    display: block;
+    text-align: justify;
+    line-height: 30px;
+    background-color: black;
+    opacity: .9;
+    z-index: 2;
+    width: 1000px;
+    font-size: 50px;
+}
+p.close {
+    display: block;
+    cursor: pointer;
+    padding: 10px;
+    background: #eb0b0b;
+    color: #f8d340;
+    border-radius: 20px;
+}
+p.close:hover {
+    background: #f8d340;
+    color: #eb0b0b;
 }

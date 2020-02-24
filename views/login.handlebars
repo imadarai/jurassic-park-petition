@@ -6,9 +6,12 @@
     <div class="error-messages">
         {{#if error}}
             <p class="error">Password is incorrect.  Please try again.</p>
+            <audio autoplay>
+                <source src="audio/magicword.mp3" type="audio/mpeg">
+            </audio>
         {{/if}}
         {{#if wrongId}}
-            <p class="error">Wrong Email.  Please try again or <a href="/register">Register</a></p>
+            <p class="error">Wrong Email.  Please try again or <a href="/registration">Register</a></p>
         {{/if}}
     <div>
     <form class="input" method="POST">
@@ -20,7 +23,7 @@
        <!-- BUTTONS -->
        <input type="hidden" name="_csrf" value="{{csrfToken}}">
        <!-- buttons -->
-       <div class="button-container">
+       <div class="update-profile">
            <button id="register">LOGIN</button>
        </div>
     </form>

@@ -1,3 +1,27 @@
+{{#unless emailError}}
+    {{#unless error}}
+        <div class="overlay">
+            <p class="overlay-text">In Ninteen Ninty Three, we lost Jurassic Park even before a single visitor could step on the island.
+            It was all due to the mis-management on behalf of John Hamm and partially
+            thinking way ahead of himself in terms of automation.   Dennis Redry was
+            an competent, yet greedy automation programmer, who eventually died at
+            the park while trying to fulfill a greedy promise.<br><br>
+            We are petitioning to get Sistema Nacional de Areas
+            de Conservacion of Costa Rica to allocate funds and put an action plan
+            in place to re-open Jurassic Park on Isla Nublar.  We believe that it was an important
+            part of human history, that was lost.  We have much better technology
+            in our hands now, which should allow us to better maintain, contain and
+            control the Island and its dinosaur population.<br><br>
+            Please take 1-2 minutes of your busy schedule and
+            register and sign our petition.  Give yourself and your kids an opportunity
+            to stand face to face with extinct creatures of past, who are now a
+            genealogy wonder of the world. <br><br> </p>
+            <p class="close">I'm ready to register</div>
+        </div>
+    {{/unless}}
+{{/unless}}
+
+
 <div id="main-image">
     <img src="/images/main.png" alt="">
 </div>
@@ -24,8 +48,12 @@
        <!-- Hidden Fields -->
        <input type="hidden" name="_csrf" value="{{csrfToken}}">
        <!-- buttons -->
-       <div class="button-container">
+       <div class="update-profile">
            <button id="register">JOIN OUR CAUSE</button>
        </div>
     </form>
 </div>
+<p class="terms">By signing up, you agree with <br>our <a href="/terms">terms and conditions</a></p>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="/register.js" charset="utf-8"></script>

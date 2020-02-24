@@ -63,17 +63,18 @@ app.post("/login",  requireLoggedOutUser, (req, res) => {
     const {email, password} = req.body;
     database.getPassword(email)
         .then(results =>{
+            //Compare() to check if Password is correct
             //SETTING COOKIE INFORMATION
             req.session.userId = results.rows[0].id;
             req.session.first = results.rows[0].first;
             req.session.last = results.rows[0].last;
-            //Compare() to check if Password is correct
             compare(password, results.rows[0].password).then( results =>{
                 if (results) {
                     //If result retrun True - forward to Petition
                     res.redirect('/petition');
                 } else {
                     //if results return false - reload with error message
+                    req.session.userId = null;
                     res.render ("login", {
                         layout: "main",
                         loginPage: true,

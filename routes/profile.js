@@ -49,12 +49,15 @@ app.get("/profile/edit", requireLoggedInUser, (req, res) => {
         .then( result => {
             //variable to set all rows to pull first and last
             let profileInfo = result.rows;
+            let first = profileInfo[0].first;
             //render signers page with first and last name of all signatures
             res.render("editprofile", {
                 layout: "main",
                 loggedIn: true,
                 //passing data
+                first,
                 profileInfo
+
             });
         }).catch(err => console.log("Err in selectAllSigners on /profile/edit ", err));
 });
