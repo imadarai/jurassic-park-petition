@@ -1,7 +1,7 @@
 # Petition designed with Jurassic Park Theme
 
 ## Website
-http://reopenpark.herokuapp.com/ 
+https://reopenjurassicpark.herokuapp.com/ 
 
 ## Tech Stack
  * Javascript
