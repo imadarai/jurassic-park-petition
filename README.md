@@ -15,7 +15,8 @@ http://reopenpark.herokuapp.com/
 ## Overview
 First, the user can register or log in. The password of new users is hashed before it is saved in the database.
 
-![Project Image](https://github.com/imadarai/jurassic-park-petition/blob/master/gifs/petition1.gif?raw=true)
+
+<p allign="center"> ![Project Image](https://github.com/imadarai/jurassic-park-petition/blob/master/gifs/petition1.gif?raw=true)</p>
 
 Afterwards, the user is prompted to fill in additional information about themselves. After doing so they are also prompted to sign the petition. The signature is turned into a URL, which is in turn stored in the database, together with the rest of the user's profile information.
 
